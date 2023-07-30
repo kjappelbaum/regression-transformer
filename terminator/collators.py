@@ -2,7 +2,6 @@ from dataclasses import dataclass
 from typing import Dict, Iterable, List, Optional, Tuple, Union
 
 import torch
-import transformers
 from transformers import DataCollatorForPermutationLanguageModeling
 from transformers.tokenization_utils import PreTrainedTokenizer
 from transformers.tokenization_utils_base import BatchEncoding

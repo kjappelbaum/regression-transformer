@@ -26,7 +26,6 @@ from transformers import Trainer, XLNetTokenizer
 from transformers.trainer_utils import (
     PREFIX_CHECKPOINT_DIR,
     EvalPrediction,
-    HPSearchBackend,
     PredictionOutput,
     TrainOutput,
     set_seed,
@@ -52,7 +51,6 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class CustomTrainer(Trainer):
     def __init__(self, *args, **kwargs):
-
         # logger.info(f'ARGS are\n{kwargs}\n{args}')
         # Remove keyword arguments unwanted by parent class
         child_kwargs = get_trainer_dict(kwargs)
@@ -107,7 +105,6 @@ class CustomTrainer(Trainer):
             )
 
             if self.numerical_encodings_format == "concat":
-
                 if self.numerical_encodings_dim > child_kwargs["d_model"]:
                     raise ValueError(
                         "Numerical encoding size cant be bigger than embedding size"
@@ -148,7 +145,6 @@ class CustomTrainer(Trainer):
 
         # Whether we train regular PLM or alternating (PP vs. CD)
         if self.alt_training:
-
             self.train_config = child_kwargs["train_config"]
             self.cg_mode = False  # Whether we are in PP or in CD mode
 
@@ -316,7 +312,6 @@ class CustomTrainer(Trainer):
 
         # If we enter here, we are in a training step where we are doing cond. gen.
         if self.alt_training and self.cg_mode:
-
             # Apply conditional generation loss (BCE loss on affected tokens) with
             # custom sample weights to reflect
             #   1) distance of sampled condition to real prop (vanilla CG collator)
@@ -454,7 +449,6 @@ class CustomTrainer(Trainer):
 
         # NOTE: Overwritten for moinitoring purposes (will print occassionally)
         if self.verbose_evaluation and random() < 0.00001:
-
             try:
                 # TODO: Only fill the masked tokens
                 prediction = (
@@ -625,7 +619,6 @@ class CustomTrainer(Trainer):
 
         epoch_pbar = tqdm(dataloader, desc=description, disable=disable_tqdm)
         for step, (inputs, a_inputs) in enumerate(zip(dataloader, alt_loader)):
-
             epoch_pbar.update(1)
             # To optionally take out keys from the collator dict.
             if pop_and_return_keys:
@@ -1028,7 +1021,6 @@ class CustomTrainer(Trainer):
             for step, (inputs, a_inputs) in enumerate(
                 zip(epoch_iterator, alt_iterator)
             ):
-
                 # Skip past any already trained steps if resuming training
                 if steps_to_skip > 0:
                     steps_to_skip -= 1
@@ -1055,7 +1047,6 @@ class CustomTrainer(Trainer):
                     len(epoch_iterator) <= self.args.gradient_accumulation_steps
                     and (step + 1) == len(epoch_iterator)
                 ):
-
                     torch.nn.utils.clip_grad_norm_(
                         model.parameters(), self.args.max_grad_norm
                     )
@@ -1290,7 +1281,6 @@ class CustomTrainer(Trainer):
         accs, sentences = evaluator.cg_evaluate(dataloader=self.alt_eval_loader, k=k)
 
         if accs[0] > np.max(self.cg_perfs[0, :]):
-
             # Save model
             checkpoint_folder = f"{PREFIX_CHECKPOINT_DIR}-joke-top1-{self.global_step}"
             output_dir = os.path.join(self.args.output_dir, checkpoint_folder)
@@ -1346,7 +1336,7 @@ class CustomTrainer(Trainer):
         eval_sampler = self._get_eval_sampler(eval_dataset)
 
         if self.alternating_collator is not None:
-            logger.warning(f"Loading alternative collator for evaluation.")
+            logger.warning("Loading alternative collator for evaluation.")
             return self.alt_eval_loader
         else:
             return DataLoader(

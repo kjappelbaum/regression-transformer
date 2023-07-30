@@ -31,7 +31,6 @@ class Evaluator(CustomTrainer):
         *args,
         **kwargs,
     ):
-
         # Call parent class constructor
         super().__init__(*args, **kwargs)
 
@@ -72,7 +71,6 @@ class Evaluator(CustomTrainer):
         )
 
     def multi_property_prediction(self, collator, save_path=None, rmse_factor: int = 1):
-
         eval_dataloader = self.get_custom_dataloader(collator)
         # Forward pass
         logits, label_ids, metrics, input_ids = self.prediction_loop(
@@ -82,7 +80,10 @@ class Evaluator(CustomTrainer):
             return_inputs=True,
             pad_idx=self.tokenizer.vocab["[PAD]"],
         )
-        keep_pos = lambda x: not np.logical_or((x == -100), (x == 0)).all()
+
+        def keep_pos(x):
+            return not np.logical_or(x == -100, x == 0).all()
+
         pos_to_keep = [i for i in range(logits.shape[1]) if keep_pos(label_ids[:, i])]
         relevant_logits = torch.Tensor(logits[:, pos_to_keep, :])
 
@@ -102,7 +103,8 @@ class Evaluator(CustomTrainer):
             all_preds[2 + k, :, pos_to_keep] = beam_preds[k, :, :]
 
         # Define rmse function
-        rmse = lambda x, y: np.sqrt(sum((np.array(x) - np.array(y)) ** 2) / len(x))
+        def rmse(x, y):
+            return np.sqrt(sum((np.array(x) - np.array(y)) ** 2) / len(x))
 
         num_props = len(collator.property_tokens)
         num_decoders = 2 + beam_preds.shape[0]
@@ -113,9 +115,7 @@ class Evaluator(CustomTrainer):
         pearsons = np.zeros((num_props, num_decoders))
         rmses = np.zeros((num_props, num_decoders))
         for idx, predictions in enumerate(all_preds):
-
             for sidx, (x, y, yhat) in enumerate(zip(input_ids, label_ids, predictions)):
-
                 x_tokens = self.tokenizer.decode(
                     x, clean_up_tokenization_spaces=False
                 ).split(" ")
@@ -151,7 +151,6 @@ class Evaluator(CustomTrainer):
                 rmses[i, idx] = r
 
         if save_path is not None:
-
             bw = self.beam_search.beam_width
             beam_cols = ["Beam"] if bw == 1 else [f"Beam{i}" for i in range(bw)]
             search_cols = ["Label", "Greedy", "Sampling"] + beam_cols
@@ -176,12 +175,7 @@ class Evaluator(CustomTrainer):
 
         eval_dataloader = self.get_custom_dataloader(collator)
 
-        # Hack for XLNet tokenizer
-        self.tokenizer.real_decoder = self.tokenizer.decode
-        self.tokenizer.decode = self.tokenizer.decode_internal
-
         for prop in collator.property_tokens:
-
             # Forward pass
             logits, label_ids, metrics, input_ids = self.prediction_loop(
                 dataloader=eval_dataloader,
@@ -199,7 +193,10 @@ class Evaluator(CustomTrainer):
             assumption that the positions are more or less *stable* across the samples
             (good for property prediction but for CD, it's less efficient).
             """
-            keep_pos = lambda x: not np.logical_or((x == -100), (x == 0)).all()
+
+            def keep_pos(x):
+                return not np.logical_or(x == -100, x == 0).all()
+
             pos_to_keep = [
                 i for i in range(logits.shape[1]) if keep_pos(label_ids[:, i])
             ]
@@ -221,7 +218,8 @@ class Evaluator(CustomTrainer):
             #     all_preds[2 + k, :, pos_to_keep] = beam_preds[k, :, :]
 
             # Define rmse function
-            rmse = lambda x, y: np.sqrt(sum((np.array(x) - np.array(y)) ** 2) / len(x))
+            def rmse(x, y):
+                return np.sqrt(sum((np.array(x) - np.array(y)) ** 2) / len(x))
 
             property_labels = torch.zeros(len(relevant_logits))
             property_predictions = torch.zeros(len(relevant_logits), len(all_preds))
@@ -231,11 +229,9 @@ class Evaluator(CustomTrainer):
                 np.zeros((len(all_preds))),
             )
             for idx, predictions in enumerate(all_preds):
-
                 for sidx, (x, y, yhat) in enumerate(
                     zip(input_ids, label_ids, predictions)
                 ):
-
                     x_tokens = self.tokenizer.decode(
                         x, clean_up_tokenization_spaces=False
                     ).split(" ")
@@ -343,12 +339,17 @@ class Evaluator(CustomTrainer):
                 collator=property_collator, prefix=f"<{prop}>0.123|"
             )
         if denormalize_params:
-            denormalize = (
-                lambda x: x * (denormalize_params[1] - denormalize_params[0])
-                + denormalize_params[0]
-            )
+
+            def denormalize(x):
+                return (
+                    x * (denormalize_params[1] - denormalize_params[0])
+                    + denormalize_params[0]
+                )
+
         else:
-            denormalize = lambda x: x
+
+            def denormalize(x):
+                return x
 
         seq_to_prop = {}
 
@@ -412,7 +413,6 @@ class Evaluator(CustomTrainer):
             for sidx, (x, y, yhat) in tqdm(
                 enumerate(zip(input_ids, label_ids, predictions))
             ):
-
                 cidx = idx * len(predictions) + sidx
                 assert len(x) == len(y), "Input and label lengths do not match"
                 assert len(x) == len(yhat), "Input and predictions do not match"
@@ -593,7 +593,7 @@ class Evaluator(CustomTrainer):
             for sidx, (x, y, yhat) in tqdm(
                 enumerate(zip(input_ids, label_ids, predictions))
             ):
-                cidx = idx * len(predictions) + sidx
+                idx * len(predictions) + sidx
                 x[x == -100] = 6
                 y[y == -100] = 6
                 yhat[yhat == -100] = 6
