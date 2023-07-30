@@ -94,7 +94,7 @@ class CharacterTokenizer:
 
 
 class ExpressionTokenizer:
-    def __init__(self, expression_tokenizer: str = "|", language: str = "perv") -> None:
+    def __init__(self, expression_tokenizer: str = "|", language: str = "PERV") -> None:
         """Constructs an expression tokenizer.
 
         Args:
