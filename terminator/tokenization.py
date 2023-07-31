@@ -4,7 +4,7 @@ from typing import Dict, List, Tuple
 
 from transformers import BertTokenizer
 
-TOKENIZER_PATTERN = "Rhodamine*101|Spiro-MeOTAD|Zr\(acac\)4|nanofibers|PEDOT*PSS|Graphite|FTO|F6-TCNNQ|Graphene|bis-C60|PCBM-60|bis‐C60|PolyTPD|P3CT-Na|C60|SAM|PCBM-70|NiMgLiO|Carbon|SWCNT|P3CT-N|PFN-Br|Bphen|oxide|Nb2O5|PEDOT|Al2O3|CuSCN|grid|TiO2|CuPc|PEIE|ZrO2|AgAl|ICBA|PEAI|MoS2|PDMS|SnO2|PCBA|Cu2O|MoOx|PMMA|MoO3|PTAA|P3HT|CPTA|TaTm|MgF2|TAPC|FTO|PFN|C60|-nw|NiO|SLG|VOx|PEI|WOx|CH3|-mp|ITO|PEN|ZnO|CdS|rGO|CuI|MgO|-np|AZO|LiF|-nt|WO3|IZO|PET|BCP|Li|Sr|Nb|Hg|Rb|Sb|Ca|Zn|In|Ge|Sm|Ag|FA|Mn|Ni|Eu|Mg|MA|Al|Au|Br|Cu|Fe|Tb|La|Bi|Pb|Ti|Cs|Te|-c|Na|Pt|Ba|Sn|Cl|Co|h|K|p|i|Q|W|O|o|g|e|V|f|n|t|u|a|M|k|T|m|S|J|C|F|l|U|A|y|R|D|P|Z|X|x|L|N|j|c|d|H|E|G|w|Y|q|z|I|r|B|b|v"
+TOKENIZER_PATTERN = "Rhodamine*101|Spiro-MeOTAD|Zr\(acac\)4|nanofibers|PEDOT*PSS|Graphite|FTO|F6-TCNNQ|Graphene|bis-C60|PCBM-60|bis-C60|PolyTPD|P3CT-Na|C60|SAM|PCBM-70|NiMgLiO|Carbon|SWCNT|P3CT-N|PFN-Br|Bphen|oxide|Nb2O5|PEDOT|Al2O3|CuSCN|grid|TiO2|CuPc|PEIE|ZrO2|AgAl|ICBA|PEAI|MoS2|PDMS|SnO2|PCBA|Cu2O|MoOx|PMMA|MoO3|PTAA|P3HT|CPTA|TaTm|MgF2|TAPC|FTO|PFN|C60|-nw|NiO|SLG|VOx|PEI|WOx|CH3|-mp|ITO|PEN|ZnO|CdS|rGO|CuI|MgO|-np|AZO|LiF|-nt|WO3|IZO|PET|BCP|Li|Sr|Nb|Hg|Rb|Sb|Ca|Zn|In|Ge|Sm|Ag|FA|Mn|Ni|Eu|Mg|MA|Al|Au|Br|Cu|Fe|Tb|La|Bi|Pb|Ti|Cs|Te|-c|Na|Pt|Ba|Sn|Cl|Co|h|K|p|i|Q|W|O|o|g|e|V|f|n|t|u|a|M|k|T|m|S|J|C|F|l|U|A|y|R|D|P|Z|X|x|L|N|j|c|d|H|E|G|w|Y|q|z|I|r|B|b|v"
 
 
 class RegexTokenizer:
@@ -150,7 +150,7 @@ class ExpressionBertTokenizer(BertTokenizer):
         cls_token="[CLS]",
         mask_token="[MASK]",
         pad_even: bool = True,
-        language: str = "SMILES",
+        language: str = "PERV",
         **kwargs,
     ) -> None:
         """Constructs an ExpressionTokenizer.
